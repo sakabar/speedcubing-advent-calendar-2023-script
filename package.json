@@ -1,0 +1,14 @@
+{
+  "name": "speedcubing-advent-calendar-2023-1201-script",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

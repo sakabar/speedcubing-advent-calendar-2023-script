@@ -2,14 +2,13 @@ const _ = require('lodash');
 const utils = require('../lib/utils');
 
 const main = () => {
-    const loopCnt = 400;
-    const msgs = [];
+    const sampleSize = 400;
 
     // 重複は排除する
     const scrambleSet = new Set();
 
     const flatten = _.flattenDeep(utils.solvedStickersInFaces);
-    while (scrambleSet.size < loopCnt) {
+    while (scrambleSet.size < sampleSize) {
         const scrambledStickers = _.shuffle(flatten);
 
         const scramble = scrambledStickers.join(',');

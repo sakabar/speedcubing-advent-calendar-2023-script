@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 // その面を正面から見て、左上から時計回り
 const solvedStickersInFaces = [
     [ 'Ubl', 'Ubr', 'Ufr', 'Ufl', ],
@@ -68,7 +70,193 @@ const isSolved = (scrambledStickersInFaces) => {
     return ans;
 };
 
+const readScramble = (inputStr) => {
+    return _.chunk(inputStr.split('\t')[1].split(','), 4);
+};
+
+const readPrioritySetting = (inputStr) => {
+    return inputStr.split('\t')[2].split('_').map(s => s.split(',').map(c => parseInt(c)));
+};
+
+const solve = (bufferStickerName, inputPrioritySetting, facePrioritySetting, inputScrambledStickersInFaces) => {
+    // スクランブルを破壊的に更新していくので、先にコピーを作っておく
+    const scrambledStickersInFaces = _.cloneDeep(inputScrambledStickersInFaces);
+
+    // prioritySettingも2ループ目から更新して破壊していくので、コピーを作っておくする
+    const prioritySetting = _.cloneDeep(inputPrioritySetting);
+
+    const {
+        faceInd: bufferFaceInd,
+        stickerInd: bufferStickerInd,
+    } = findStickerIndOfSolved(bufferStickerName);
+
+    // まず、bufferFaceIndとbufferStickerIndを見る
+    let stickerAtBuffer = scrambledStickersInFaces[bufferFaceInd][bufferStickerInd];
+    const stickersToMemorize = [];
+
+    while (!isSolved(scrambledStickersInFaces)) {
+        // そのステッカーが本来入るべきステッカーの面の中で、まだ埋まっていない面をprioritySettingに従って見る
+        let {
+            faceInd: faceIndAtTarget,
+            stickerInd: strictStickerIndAtTarget,
+        } = findStickerIndOfSolved(stickerAtBuffer);
+
+
+        let stickerIndAtTarget = null;
+        const priorityInFace = prioritySetting[faceIndAtTarget];
+        // console.log(priorityInFace);
+
+        for (const priorityStickerInd of priorityInFace) {
+            const priorityStickerName = solvedStickersInFaces[faceIndAtTarget][priorityStickerInd];
+
+            // そのステッカーはもう正しく埋まっているか?
+            if (scrambledStickersInFaces[faceIndAtTarget][priorityStickerInd][0] !== priorityStickerName[0]) {
+                stickerIndAtTarget = priorityStickerInd;
+
+                break;
+            }
+        }
+
+        // 白面が全て埋まっていた場合にはstickerIndAtTargetがnullとなる
+        if (stickerIndAtTarget === null) {
+            // console.log('U Face is fulfilled');
+
+            // facePrioritySettingの順に従って、正しく埋まっていないステッカーを1つ選び、入れ換える
+            for (const tmpFaceInd of facePrioritySetting) {
+                for (let tmpStickerInd=0; tmpStickerInd<scrambledStickersInFaces[tmpFaceInd].length;tmpStickerInd++) {
+                    if (scrambledStickersInFaces[tmpFaceInd][tmpStickerInd][0] !== solvedStickersInFaces[tmpFaceInd][tmpStickerInd][0]) {
+                        // スワップする
+                        faceIndAtTarget = tmpFaceInd;
+                        stickerIndAtTarget = tmpStickerInd;
+
+                        // ループ開始に選んだステッカーがループ終了時に選ばれるように、prioritySettingを更新する
+                        const newArr = prioritySetting[tmpFaceInd].filter(ind => ind !== stickerIndAtTarget);
+                        newArr.push(tmpStickerInd);
+                        prioritySetting[tmpFaceInd] = newArr;
+                        break;
+                    }
+                }
+
+                if (stickerIndAtTarget !== null) {
+                    break;
+                }
+            }
+        }
+
+        const newStickerName = scrambledStickersInFaces[faceIndAtTarget][stickerIndAtTarget];
+        const stickerToMemorize = solvedStickersInFaces[faceIndAtTarget][stickerIndAtTarget];
+        // console.log(`${stickerAtBuffer} goes to [${faceIndAtTarget}][${stickerIndAtTarget}] i.e. ${stickerToMemorize}`);
+        stickersToMemorize.push(stickerToMemorize);
+
+        // バッファと入れ替える
+        scrambledStickersInFaces[bufferFaceInd][bufferStickerInd] = newStickerName;
+        scrambledStickersInFaces[faceIndAtTarget][stickerIndAtTarget] = stickerAtBuffer;
+        stickerAtBuffer = newStickerName;
+    }
+
+    return stickersToMemorize;
+};
+
+const generateRegularPriorityArr = (bufferFaceInd, bufferStickerInd, faceInd, startInd, isClockwise) => {
+    if (bufferFaceInd === faceInd) {
+        // バッファの場合、バッファが必ず最後に来るようにする
+
+        // バッファじゃない扱いで生成した後に調整する
+        const dummyBufferFaceInd = (faceInd + 1) % 6;
+        const generatedAsNonBufferFace = generateRegularPriorityArr(dummyBufferFaceInd, bufferStickerInd, faceInd, startInd, isClockwise);
+
+        const ans = generatedAsNonBufferFace.filter(i => i !== bufferStickerInd);
+        ans.push(bufferStickerInd);
+        return ans;
+    } else {
+        if (isClockwise) {
+            return _.range(startInd, startInd+4).map(i => i%4);
+        } else {
+            return _.range(startInd, startInd-4, -1).map(i => (i+4)%4);
+        }
+    }
+}
+
+const generateRegularPrioritySettings = (bufferStickerName) => {
+    const {
+        faceInd: bufferFaceInd,
+        stickerInd: bufferStickerInd,
+    } = findStickerIndOfSolved(bufferStickerName);
+
+    const ans = [];
+
+    // 愚直だが、12重ループで書く
+    for (let uFaceStartInd=0; uFaceStartInd<4; uFaceStartInd++) {
+        for (let lFaceStartInd=0; lFaceStartInd<4; lFaceStartInd++) {
+            for (let fFaceStartInd=0; fFaceStartInd<4; fFaceStartInd++) {
+                for (let rFaceStartInd=0; rFaceStartInd<4; rFaceStartInd++) {
+                    for (let bFaceStartInd=0; bFaceStartInd<4; bFaceStartInd++) {
+                        for (let dFaceStartInd=0; dFaceStartInd<4; dFaceStartInd++) {
+                            for (const isUFaceClockwise of [true, false]) {
+                                for (const isLFaceClockwise of [true, false]) {
+                                    for (const isFFaceClockwise of [true, false]) {
+                                        for (const isRFaceClockwise of [true, false]) {
+                                            for (const isBFaceClockwise of [true, false]) {
+                                                for (const isDFaceClockwise of [true, false]) {
+
+                                                    let isOk = true;
+
+                                                    // startIndがバッファと同じ場合は、バッファを最後に回す処理が動くことにより、実質的に他のステッカーが起点となる場合と同じになってしまうため、ダブルカウントを防ぐために除外する。
+                                                    switch (bufferFaceInd) {
+                                                    case 0:
+                                                        isOk = uFaceStartInd !== bufferStickerInd;
+                                                        break;
+                                                    case 1:
+                                                        isOk = lFaceStartInd !== bufferStickerInd;
+                                                        break;
+                                                    case 2:
+                                                        isOk = fFaceStartInd !== bufferStickerInd;
+                                                        break;
+                                                    case 3:
+                                                        isOk = rFaceStartInd !== bufferStickerInd;
+                                                        break;
+                                                    case 4:
+                                                        isOk = bFaceStartInd !== bufferStickerInd;
+                                                        break;
+                                                    case 5:
+                                                        isOk = dFaceStartInd !== bufferStickerInd;
+                                                        break;
+                                                    }
+
+                                                    if (isOk) {
+                                                        const prioritySetting = [
+                                                            generateRegularPriorityArr(bufferFaceInd, bufferStickerInd, 0, uFaceStartInd, isUFaceClockwise),
+                                                            generateRegularPriorityArr(bufferFaceInd, bufferStickerInd, 1, lFaceStartInd, isLFaceClockwise),
+                                                            generateRegularPriorityArr(bufferFaceInd, bufferStickerInd, 2, fFaceStartInd, isFFaceClockwise),
+                                                            generateRegularPriorityArr(bufferFaceInd, bufferStickerInd, 3, rFaceStartInd, isRFaceClockwise),
+                                                            generateRegularPriorityArr(bufferFaceInd, bufferStickerInd, 4, bFaceStartInd, isBFaceClockwise),
+                                                            generateRegularPriorityArr(bufferFaceInd, bufferStickerInd, 5, dFaceStartInd, isDFaceClockwise),
+                                                        ];
+
+                                                        ans.push(prioritySetting);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return ans;
+}
+
 module.exports.solvedStickersInFaces = solvedStickersInFaces;
 module.exports.findStickerInd = findStickerInd;
 module.exports.findStickerIndOfSolved = findStickerIndOfSolved;
 module.exports.isSolved = isSolved;
+module.exports.readScramble = readScramble;
+module.exports.readPrioritySetting = readPrioritySetting;
+module.exports.solve = solve;
+module.exports.generateRegularPriorityArr = generateRegularPriorityArr;
+module.exports.generateRegularPrioritySettings = generateRegularPrioritySettings;

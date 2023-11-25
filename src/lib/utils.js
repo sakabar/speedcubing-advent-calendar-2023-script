@@ -71,11 +71,28 @@ const isSolved = (scrambledStickersInFaces) => {
 };
 
 const readScramble = (inputStr) => {
-    return _.chunk(inputStr.split('\t')[1].split(','), 4);
+    const columns = inputStr.split('\t');
+
+    const scrambleLabel = columns[0]
+    const scrambledStickersInFaces = _.chunk(columns[1].split(','), 4);
+
+    return {
+        scrambleLabel,
+        scrambledStickersInFaces,
+    };
 };
 
 const readPrioritySetting = (inputStr) => {
-    return inputStr.split('\t')[2].split('_').map(s => s.split(',').map(c => parseInt(c)));
+    const columns = inputStr.split('\t');
+    const prioritySettingLabel = columns[0];
+    const bufferStickerName = columns[1];
+    const prioritySetting = columns[2].split('_').map(s => s.split(',').map(c => parseInt(c)));
+
+    return {
+        prioritySettingLabel,
+        bufferStickerName,
+        prioritySetting,
+    };
 };
 
 const solve = (bufferStickerName, inputPrioritySetting, facePrioritySetting, inputScrambledStickersInFaces) => {
@@ -251,6 +268,134 @@ const generateRegularPrioritySettings = (bufferStickerName) => {
     return ans;
 }
 
+const inverseMove = (moveStr) => {
+    if (moveStr.slice(-1) === "'") {
+        return moveStr.slice(0, -1);
+    } else if (moveStr.slice(-1) === '2') {
+        return moveStr;
+    } else {
+        return `${moveStr}'`;
+    }
+};
+
+const inverseMoves = (movesStr) => {
+    const ans = movesStr.split(/\s+/).map(moveStr => inverseMove(moveStr));
+    ans.reverse();
+
+    return ans.join(' ');
+};
+
+const getMoveType = (moveStr) => {
+    if (moveStr.slice(-1) === "'" || moveStr.slice(-1) === '2') {
+        return moveStr.slice(0, -1);
+    } else {
+        return moveStr;
+    }
+};
+
+// QTM: QuarterTurnMetric
+const getQuarterDegreeOfMove = (moveStr) => {
+    if (moveStr.slice(-1) === "'") {
+        return -1;
+    } else if (moveStr.slice(-1) === '2') {
+        return 2;
+    } else {
+        return 1;
+    }
+};
+
+const qtmToMove = (moveStr, qtm) => {
+    switch ((qtm + 4)% 4) {
+    case 0:
+        return '';
+    case 1:
+        return getMoveType(moveStr);
+    case 2:
+        return `${getMoveType(moveStr)}2`;
+    case 3:
+        return `${getMoveType(moveStr)}'`;
+    }
+}
+
+const cancelMoves = (movesStr) => {
+    // スタックに積んで処理する
+    const stack = [];
+
+    for (const moveStr of movesStr.split(/\s+/)) {
+        if (stack.length === 0) {
+            stack.push(moveStr);
+        } else {
+            const top = stack.slice(-1)[0];
+
+            if (getMoveType(moveStr) === getMoveType(top)) {
+                const qtm = getQuarterDegreeOfMove(moveStr) + getQuarterDegreeOfMove(top);
+                const canceledMove = qtmToMove(moveStr, qtm);
+                stack.pop();
+                stack.push(canceledMove);
+            } else {
+                stack.push(moveStr);
+            }
+        }
+    }
+
+    return stack.join(' ');
+}
+
+const parseThreeStyle = (inputStr) => {
+    const nonSetupRe = /^\[([^,]+),([^,]+)\]$/;
+    const setupRe = /^\[(.*?): (.+)\]$/;
+
+    const nonSetupMatch = inputStr.match(nonSetupRe);
+    const setupMatch = inputStr.match(setupRe);
+
+    if (setupMatch) {
+        const setup = setupMatch[1].trim();
+        const rest = setupMatch[2].trim();
+
+        return cancelMoves(`${setup} ${parseThreeStyle(rest)} ${inverseMoves(setup)}`);
+    } else if (nonSetupMatch) {
+        const move1 = nonSetupMatch[1].trim();
+        const move2 = nonSetupMatch[2].trim();
+
+        return cancelMoves(`${move1} ${move2} ${inverseMoves(move1)} ${inverseMoves(move2)}`);
+    }
+
+    return cancelMoves(inputStr);
+};
+
+const getNumberOfMove = (moveStr) => {
+    if ([ 'l', 'r', 'd', ].includes(getMoveType(moveStr))) {
+        return 2;
+    } else if ([ 'x', 'y', 'z', ].includes(getMoveType(moveStr))) {
+        return 3;
+    } else {
+        return 1;
+    }
+};
+
+// 基本的にはQTM
+// u, u'以外のスライスは2手
+// 持ち替えは3手。ただし、連続する持ち替えは1つとして教える。 (例: x yの持ち替えは3手)
+const getNumberOfMoves = (canceledMovesStr) => {
+    let ans = 0;
+
+    let previousMoveType = null;
+    for (const moveStr of canceledMovesStr.split(/\s+/)) {
+        if (previousMoveType !== null && [ 'x', 'y', 'z', ].includes(getMoveType(previousMoveType)) && [ 'x', 'y', 'z', ].includes(getMoveType(moveStr))) {
+            // 連続する持ち替えは1つとして教える。前の回転の時にカウントしたはずなので加算しない
+            ans += 0;
+        } else if (moveStr.slice(-1) === '2') {
+            ans += getNumberOfMove(moveStr) * 2;
+        } else {
+            ans += getNumberOfMove(moveStr);
+        }
+
+        previousMoveType = getMoveType(moveStr);
+    }
+
+    return ans;
+}
+
 module.exports.solvedStickersInFaces = solvedStickersInFaces;
 module.exports.findStickerInd = findStickerInd;
 module.exports.findStickerIndOfSolved = findStickerIndOfSolved;
@@ -260,3 +405,9 @@ module.exports.readPrioritySetting = readPrioritySetting;
 module.exports.solve = solve;
 module.exports.generateRegularPriorityArr = generateRegularPriorityArr;
 module.exports.generateRegularPrioritySettings = generateRegularPrioritySettings;
+module.exports.inverseMove = inverseMove;
+module.exports.inverseMoves = inverseMoves;
+module.exports.getMoveType = getMoveType;
+module.exports.cancelMoves = cancelMoves;
+module.exports.parseThreeStyle = parseThreeStyle;
+module.exports.getNumberOfMoves = getNumberOfMoves;

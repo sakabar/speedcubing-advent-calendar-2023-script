@@ -7,7 +7,8 @@
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "simple-statistics": "^7.8.3"
   },
   "devDependencies": {
     "jest": "^29.7.0"

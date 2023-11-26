@@ -355,3 +355,16 @@ describe('getNumberOfMoves()', () => {
         expect(utils.getNumberOfMoves("U d U'")).toBe(4);
     });
 });
+
+describe('readAlgorithm()', () => {
+    test('正常系', () => {
+        const inputStr = "Ubl Rbu Ufl\t[U2: [r' u r, U']]"
+        const actual = utils.readAlgorithm(inputStr);
+        const expected = {
+            stickers: 'Ubl Rbu Ufl',
+            algorithm: "U2 r' u r U' r' u' r U'",
+        };
+
+        expect(actual).toStrictEqual(expected);
+    });
+});

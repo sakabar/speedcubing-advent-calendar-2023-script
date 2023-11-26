@@ -394,7 +394,18 @@ const getNumberOfMoves = (canceledMovesStr) => {
     }
 
     return ans;
-}
+};
+
+const readAlgorithm = (inputStr) => {
+    const columns = inputStr.split('\t');
+    const stickers = columns[0];
+    const alg = columns[1];
+
+    return {
+        stickers,
+        algorithm: parseThreeStyle(alg),
+    };
+};
 
 module.exports.solvedStickersInFaces = solvedStickersInFaces;
 module.exports.findStickerInd = findStickerInd;
@@ -411,3 +422,4 @@ module.exports.getMoveType = getMoveType;
 module.exports.cancelMoves = cancelMoves;
 module.exports.parseThreeStyle = parseThreeStyle;
 module.exports.getNumberOfMoves = getNumberOfMoves;
+module.exports.readAlgorithm = readAlgorithm;

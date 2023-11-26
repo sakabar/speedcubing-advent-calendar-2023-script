@@ -4,7 +4,7 @@ const _ = require('lodash');
 const solvedStickersInFaces = [
     [ 'Ubl', 'Ubr', 'Ufr', 'Ufl', ],
     [ 'Lbu', 'Lfu', 'Ldf', 'Lbd', ],
-    [ 'Flu', 'Fru', 'Frd', 'Fdl', ],
+    [ 'Flu', 'Fru', 'Fdr', 'Fdl', ],
     [ 'Rfu', 'Rbu', 'Rbd', 'Rdf', ],
     [ 'Bru', 'Blu', 'Bdl', 'Bdr', ],
     [ 'Dfl', 'Dfr', 'Dbr', 'Dbl', ],

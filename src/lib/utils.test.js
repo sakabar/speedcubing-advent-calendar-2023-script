@@ -31,7 +31,7 @@ describe('isSolved()', () => {
         const scramble = [
             [ 'Ufl', 'Ubl', 'Ubr', 'Ufr', ],
             [ 'Lbu', 'Lfu', 'Ldf', 'Lbd', ],
-            [ 'Flu', 'Fru', 'Frd', 'Fdl', ],
+            [ 'Flu', 'Fru', 'Fdr', 'Fdl', ],
             [ 'Rfu', 'Rbu', 'Rbd', 'Rdf', ],
             [ 'Bru', 'Blu', 'Bdl', 'Bdr', ],
             [ 'Dfl', 'Dfr', 'Dbr', 'Dbl', ],
@@ -44,7 +44,7 @@ describe('isSolved()', () => {
         const scramble = [
             [ 'Ufl', 'Lfu', 'Ubr', 'Ufr', ],
             [ 'Lbu', 'Ubl', 'Ldf', 'Lbd', ],
-            [ 'Flu', 'Fru', 'Frd', 'Fdl', ],
+            [ 'Flu', 'Fru', 'Fdr', 'Fdl', ],
             [ 'Rfu', 'Rbu', 'Rbd', 'Rdf', ],
             [ 'Bru', 'Blu', 'Bdl', 'Bdr', ],
             [ 'Dfl', 'Dfr', 'Dbr', 'Dbl', ],
@@ -56,7 +56,7 @@ describe('isSolved()', () => {
 
 describe('readScramble()', () => {
     test('正常系', () => {
-        const inputStr = '0001\tBdl,Dbl,Rdf,Bru,Blu,Fru,Rbd,Bdr,Rfu,Rbu,Ldf,Frd,Flu,Ubr,Lbd,Ufl,Lfu,Dfr,Fdl,Ufr,Lbu,Dbr,Dfl,Ubl';
+        const inputStr = '0001\tBdl,Dbl,Rdf,Bru,Blu,Fru,Rbd,Bdr,Rfu,Rbu,Ldf,Fdr,Flu,Ubr,Lbd,Ufl,Lfu,Dfr,Fdl,Ufr,Lbu,Dbr,Dfl,Ubl';
 
         const actual = utils.readScramble(inputStr);
         const expected = {
@@ -64,7 +64,7 @@ describe('readScramble()', () => {
             scrambledStickersInFaces: [
                 [ 'Bdl', 'Dbl', 'Rdf', 'Bru', ],
                 [ 'Blu', 'Fru', 'Rbd', 'Bdr', ],
-                [ 'Rfu', 'Rbu', 'Ldf', 'Frd', ],
+                [ 'Rfu', 'Rbu', 'Ldf', 'Fdr', ],
                 [ 'Flu', 'Ubr', 'Lbd', 'Ufl', ],
                 [ 'Lfu', 'Dfr', 'Fdl', 'Ufr', ],
                 [ 'Lbu', 'Dbr', 'Dfl', 'Ubl', ],
@@ -116,7 +116,7 @@ describe('solve()', () => {
         const scrambledStickersInFaces = [
             [ 'Lfu', 'Ubr', 'Ufr', 'Ufl', ],
             [ 'Lbu', 'Fru', 'Ldf', 'Lbd', ],
-            [ 'Flu', 'Ubl', 'Frd', 'Fdl', ],
+            [ 'Flu', 'Ubl', 'Fdr', 'Fdl', ],
             [ 'Rfu', 'Rbu', 'Rbd', 'Rdf', ],
             [ 'Bru', 'Blu', 'Bdl', 'Bdr', ],
             [ 'Dfl', 'Dfr', 'Dbr', 'Dbl', ],
@@ -146,7 +146,7 @@ describe('solve()', () => {
         const scrambledStickersInFaces = [
             [ 'Lfu', 'Ubr', 'Ufr', 'Ufl', ],
             [ 'Lbu', 'Ubl', 'Ldf', 'Lbd', ],
-            [ 'Flu', 'Fru', 'Frd', 'Fdl', ],
+            [ 'Flu', 'Fru', 'Fdr', 'Fdl', ],
             [ 'Rfu', 'Rbu', 'Rbd', 'Rdf', ],
             [ 'Bru', 'Dfr', 'Dbr', 'Bdr', ],
             [ 'Dfl', 'Blu', 'Bdl', 'Dbl', ],

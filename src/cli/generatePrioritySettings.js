@@ -50,7 +50,7 @@ const main = () => {
 
     let cnt = 1;
     for (const prioritySettingStr of prioritySettingStrSet) {
-        const msg = `${String(cnt).padStart(4, '0')}\t${bufferStickerName}\t${prioritySettingStr}`;
+        const msg = `rand_${String(cnt).padStart(4, '0')}\t${bufferStickerName}\t${prioritySettingStr}`;
 
         console.log(msg);
         cnt++;

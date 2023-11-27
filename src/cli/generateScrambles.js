@@ -17,7 +17,7 @@ const main = () => {
 
     let cnt = 1;
     for (const scramble of scrambleSet) {
-        const msg = `${String(cnt).padStart(4, '0')}\t${scramble}`;
+        const msg = `rand_${String(cnt).padStart(4, '0')}\t${scramble}`;
 
         console.log(msg);
         cnt++;

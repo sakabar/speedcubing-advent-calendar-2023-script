@@ -8,14 +8,14 @@ const main = () => {
     const setting = yaml.load(fs.readFileSync('conf/setting.yaml', 'utf8'));
     const bufferStickerName = setting['bufferStickerName'];
 
-    const scrambleObjs = fs.readFileSync('generated/scrambles.txt', 'utf8')
+    const sampledScrambleObjs = fs.readFileSync('generated/sampledScrambles.txt', 'utf8')
           .split('\n')
           .filter(s => s !== '')
           .map(line => {
             return utils.readScramble(line);
           });
 
-    const prioritySettingObjs = fs.readFileSync('generated/prioritySettings.txt', 'utf8')
+    const sampledPrioritySettingObjs = fs.readFileSync('generated/sampledPrioritySettings.txt', 'utf8')
           .split('\n')
           .filter(s => s !== '')
           .map(line => {
@@ -40,19 +40,19 @@ const main = () => {
     // R,F,L,B,D,U
     const facePrioritySetting = [ 3, 2, 1, 4, 5, 0, ];
 
-    for (const prioritySettingObj of prioritySettingObjs) {
+    for (const sampledPrioritySettingObj of sampledPrioritySettingObjs) {
         const {
             prioritySettingLabel,
             prioritySetting,
-        } = prioritySettingObj;
+        } = sampledPrioritySettingObj;
 
 
         const tekazu_arr = [];
-        for (const scrambleObj of scrambleObjs) {
+        for (const sampledScrambleObj of sampledScrambleObjs) {
             const {
                 scrambleLabel,
                 scrambledStickersInFaces,
-            } = scrambleObj;
+            } = sampledScrambleObj;
 
             const stickersToMemorize = utils.solve(bufferStickerName, prioritySetting, facePrioritySetting, scrambledStickersInFaces);
 

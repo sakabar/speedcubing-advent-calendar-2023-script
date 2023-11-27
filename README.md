@@ -3,9 +3,9 @@ https://adventar.org/calendars/8548
 
 
 ```shell
-node src/cli/generateScrambles.js > generated/sampledScrambles.txt
+node src/cli/generateScrambles.js > generated/sampledScrambles.tsv
 ```
 
 ``` shell
-node src/cli/generatePrioritySettings.js > generated/sampledPrioritySettings.txt
+node src/cli/generatePrioritySettings.js > generated/sampledPrioritySettings.tsv
 ```

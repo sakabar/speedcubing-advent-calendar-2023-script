@@ -8,14 +8,14 @@ const main = () => {
     const setting = yaml.load(fs.readFileSync('conf/setting.yaml', 'utf8'));
     const bufferStickerName = setting['bufferStickerName'];
 
-    const sampledScrambleObjs = fs.readFileSync('generated/sampledScrambles.txt', 'utf8')
+    const sampledScrambleObjs = fs.readFileSync('generated/sampledScrambles.tsv', 'utf8')
           .split('\n')
           .filter(s => s !== '')
           .map(line => {
             return utils.readScramble(line);
           });
 
-    const sampledPrioritySettingObjs = fs.readFileSync('generated/sampledPrioritySettings.txt', 'utf8')
+    const sampledPrioritySettingObjs = fs.readFileSync('generated/sampledPrioritySettings.tsv', 'utf8')
           .split('\n')
           .filter(s => s !== '')
           .map(line => {
@@ -24,7 +24,7 @@ const main = () => {
 
     // Stickers => Alg
     const algDict = {};
-    fs.readFileSync('conf/algorithms.txt', 'utf8')
+    fs.readFileSync('conf/algorithms.tsv', 'utf8')
           .split('\n')
           .filter(s => s !== '')
           .map(line => {

@@ -157,6 +157,65 @@ describe('solve()', () => {
         const expected = [ 'Lfu', 'Blu', 'Dfr', 'Bdl', 'Dbr', 'Blu', ];
         expect(actual).toStrictEqual(expected);
     });
+
+    test.only('正常系: 複雑なケース: バグって同じ面同士のステッカーの交換が発生してしまったケース', () => {
+        const bufferStickerName = 'Ubl';
+        const prioritySetting = [
+            [ 1, 3, 2, 0 ],
+            [ 2, 0, 1, 3 ],
+            [ 1, 3, 0, 2 ],
+            [ 1, 0, 2, 3 ],
+            [ 2, 3, 0, 1 ],
+            [ 1, 2, 3, 0 ]
+        ];
+
+        const facePrioritySetting = [ 3, 2, 1, 4, 5, 0, ];
+
+
+        // 確認用
+        const solvedStickersInFaces = [
+            [ 'Ubl', 'Ubr', 'Ufr', 'Ufl', ],
+            [ 'Lbu', 'Lfu', 'Ldf', 'Lbd', ],
+            [ 'Flu', 'Fru', 'Fdr', 'Fdl', ],
+            [ 'Rfu', 'Rbu', 'Rbd', 'Rdf', ],
+            [ 'Bru', 'Blu', 'Bdl', 'Bdr', ],
+            [ 'Dfl', 'Dfr', 'Dbr', 'Dbl', ],
+        ];
+
+        const scrambledStickersInFaces = [
+            [ 'Dbl', 'Blu', 'Dbr', 'Dfr' ],
+            [ 'Dfl', 'Lbd', 'Rdf', 'Rfu' ],
+            [ 'Ubr', 'Rbd', 'Fdr', 'Fdl' ],
+            [ 'Bdr', 'Flu', 'Ufr', 'Lfu' ],
+            [ 'Fru', 'Ldf', 'Bru', 'Ufl' ],
+            [ 'Lbu', 'Ubl', 'Rbu', 'Bdl' ]
+        ];
+        const actual = utils.solve(bufferStickerName, prioritySetting, facePrioritySetting, scrambledStickersInFaces);
+
+        const expected = [
+            'Dfr',
+            'Ubr',
+            'Bdr',
+            'Ufl',
+            'Dbr',
+            'Rbu',
+            'Fru',
+            'Rfu',
+            'Bru',
+            'Flu',
+            'Ufr',
+            'Dbl',
+            'Blu',
+            'Ldf',
+            'Rbd',
+            'Lbu',
+            'Dfl',
+            'Lbd',
+            'Rdf',
+            'Lbu',
+        ];
+        expect(actual).toStrictEqual(expected);
+    });
 });
 
 describe('generateRegularPriorityArr()', () => {

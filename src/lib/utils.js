@@ -115,7 +115,6 @@ const solve = (bufferStickerName, inputPrioritySetting, facePrioritySetting, inp
         // そのステッカーが本来入るべきステッカーの面の中で、まだ埋まっていない面をprioritySettingに従って見る
         let {
             faceInd: faceIndAtTarget,
-            stickerInd: strictStickerIndAtTarget,
         } = findStickerIndOfSolved(stickerAtBuffer);
 
 
@@ -138,10 +137,14 @@ const solve = (bufferStickerName, inputPrioritySetting, facePrioritySetting, inp
         if (stickerIndAtTarget === null) {
             // console.log('U Face is fulfilled');
 
-            // facePrioritySettingの順に従って、正しく埋まっていないステッカーを1つ選び、入れ換える
+            // facePrioritySettingの順に従って、
+            // 正しく埋まっていないステッカー かつ 直前に選んだ面とは違うステッカー を1つ選び、入れ換える
+            // 「直前に選んだ面とは違うステッカー」という条件が無いと、
+            // R面でループが終了してバッファ面が全部埋まった後、またR面からループを開始しようとして同じ面の文字が2文字連続してしまい、
+            // 3-styleで回せないという問題が起こる。
             for (const tmpFaceInd of facePrioritySetting) {
                 for (let tmpStickerInd=0; tmpStickerInd<scrambledStickersInFaces[tmpFaceInd].length;tmpStickerInd++) {
-                    if (scrambledStickersInFaces[tmpFaceInd][tmpStickerInd][0] !== solvedStickersInFaces[tmpFaceInd][tmpStickerInd][0]) {
+                    if (scrambledStickersInFaces[tmpFaceInd][tmpStickerInd][0] !== solvedStickersInFaces[tmpFaceInd][tmpStickerInd][0] && solvedStickersInFaces[tmpFaceInd][tmpStickerInd][0] !== stickersToMemorize.slice(-1)[0][0]) {
                         // スワップする
                         faceIndAtTarget = tmpFaceInd;
                         stickerIndAtTarget = tmpStickerInd;

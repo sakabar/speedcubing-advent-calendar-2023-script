@@ -1,2 +1,6 @@
 ---
 bufferStickerName: "Ubl"
+
+# 1-origin
+minRegularPrioritySettingNo: 78039
+maxRegularPrioritySettingNo: 78039

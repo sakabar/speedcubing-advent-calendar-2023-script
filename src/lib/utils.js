@@ -403,10 +403,12 @@ const readAlgorithm = (inputStr) => {
     const columns = inputStr.split('\t');
     const stickers = columns[0];
     const alg = columns[1];
+    const algorithm = parseThreeStyle(alg);
 
     return {
         stickers,
-        algorithm: parseThreeStyle(alg),
+        algorithm,
+        numberOfMoves: getNumberOfMoves(algorithm),
     };
 };
 

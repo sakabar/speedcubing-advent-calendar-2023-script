@@ -158,7 +158,7 @@ describe('solve()', () => {
         expect(actual).toStrictEqual(expected);
     });
 
-    test.only('正常系: 複雑なケース: バグって同じ面同士のステッカーの交換が発生してしまったケース', () => {
+    test('正常系: 複雑なケース: バグって同じ面同士のステッカーの交換が発生してしまったケース', () => {
         const bufferStickerName = 'Ubl';
         const prioritySetting = [
             [ 1, 3, 2, 0 ],
@@ -422,6 +422,7 @@ describe('readAlgorithm()', () => {
         const expected = {
             stickers: 'Ubl Rbu Ufl',
             algorithm: "U2 r' u r U' r' u' r U'",
+            numberOfMoves: 14,
         };
 
         expect(actual).toStrictEqual(expected);
